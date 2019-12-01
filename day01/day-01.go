@@ -30,19 +30,21 @@ func main() {
 	json.Unmarshal(byteValue, &modules)
 
 	totalFuel := 0
+	part1Fuel := 0
 	for _, mod := range modules {
-		// For a mass of 12, divide by 3 and round down to get 4, then subtract 2 to get 2.
 		moduleFuel := fuelForWeight(mod)
+		part1Fuel += moduleFuel
 		fuelForFuel := fuelForWeight(moduleFuel)
 		for fuelForFuel > 0 {
 			moduleFuel += fuelForFuel
 			fuelForFuel = fuelForWeight(fuelForFuel)
 		}
 		totalFuel += moduleFuel
-		helpers.Log(strconv.Itoa(mod) + " uses " + strconv.Itoa(moduleFuel))
+		// helpers.Log(strconv.Itoa(mod) + " uses " + strconv.Itoa(moduleFuel))
 	}
 
-	helpers.Log("Fuel Required: " + strconv.Itoa(totalFuel))
+	helpers.Log("Module Fuel Required (p1): " + strconv.Itoa(part1Fuel))
+	helpers.Log("Fuel Required (p2): " + strconv.Itoa(totalFuel))
 }
 
 func fuelForWeight(amt int) int {
