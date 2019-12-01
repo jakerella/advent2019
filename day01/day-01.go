@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	h "advent2019/helpers"
+	h "github.com/jakerella/advent2019/helpers"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"os"
