@@ -1,33 +1,26 @@
 package main
 
 import (
-	"advent2019/helpers"
+	"errors"
+	h "advent2019/helpers"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 	"os"
-	"io/ioutil"
 	"encoding/json"
 	"math"
 )
 
 func main() {
-	helpers.WriteHeader(1)
+	h.WriteHeader(1)
 	
-	if len(os.Args) < 2 {
-		helpers.Error("Please provide the input filename")
-		return
-	}
+	if len(os.Args) < 2 { h.OhShit(errors.New("Please provide the input filename")) }
 
 	input, err := os.Open(os.Args[1])
-	if err != nil {
-		helpers.Error(err.Error())
-		return
-	}
+	if err != nil { h.OhShit(err) }
 	defer input.Close()
 
 	modules := []int{}
-	byteValue, _ := ioutil.ReadAll(input)
-
-	json.Unmarshal(byteValue, &modules)
+	h.OhShit(json.NewDecoder(input).Decode(&modules))
 
 	totalFuel := 0
 	part1Fuel := 0
@@ -40,11 +33,11 @@ func main() {
 			fuelForFuel = fuelForWeight(fuelForFuel)
 		}
 		totalFuel += moduleFuel
-		// helpers.Log(strconv.Itoa(mod) + " uses " + strconv.Itoa(moduleFuel))
+		// log.Info(strconv.Itoa(mod) + " uses " + strconv.Itoa(moduleFuel))
 	}
 
-	helpers.Log("Module Fuel Required (p1): " + strconv.Itoa(part1Fuel))
-	helpers.Log("Fuel Required (p2): " + strconv.Itoa(totalFuel))
+	log.Info("Module Fuel Required (p1): " + strconv.Itoa(part1Fuel))
+	log.Info("Fuel Required (p2): " + strconv.Itoa(totalFuel))
 }
 
 func fuelForWeight(amt int) int {
