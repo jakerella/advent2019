@@ -20,13 +20,41 @@ func main() {
 	program := []int{}
 	h.OhShit(json.NewDecoder(input).Decode(&program))
 
-	partOne := program
+	partOne := append([]int(nil), program...)
 	partOne[1] = 12
 	partOne[2] = 2
-	log.Info("New address 0 (p1): ", intcode(partOne))
+	value, err := intcode(partOne)
+	if err != nil { log.Warn(err) }
+	log.Info("New address 0 (p1): ", value)
+
+	for i := 0; i < 100; i++ {
+		for j := 0; j < 100; j++ {
+			test := append([]int(nil), program...)
+			test[1] = i
+			test[2] = j
+			result, err := intcode(test)
+			if err != nil {
+				log.Warn(err)
+				continue
+			}
+			if result == 19690720 {
+				log.Info("Found target (p2), inputs: ", i, j, " .. 100 * noun + verb: ", (100 * i + j))
+				return
+			} // else {
+			//	log.Info("Wrong result: ", result, " - inputs: ", i, j)
+			//}
+		}
+	}
+	log.Info("Did not find target result")
 }
 
-func intcode(program []int) int {
+func intcode(program []int) (value int, err error) {
+	defer func() {
+        if (recover() != nil) {
+            err = errors.New("Address out of bounds")
+        }
+	}()
+	
 	var address int = 0
 	for program[address] != 99 {
 		if program[address] == 1 {
@@ -36,5 +64,5 @@ func intcode(program []int) int {
 		}
 		address += 4
 	}
-	return program[0]
+	return program[0], nil
 }
