@@ -20,17 +20,21 @@ func main() {
 	program := []int{}
 	h.OhShit(json.NewDecoder(input).Decode(&program))
 
+	partOne := program
+	partOne[1] = 12
+	partOne[2] = 2
+	log.Info("New address 0 (p1): ", intcode(partOne))
+}
+
+func intcode(program []int) int {
 	var address int = 0
 	for program[address] != 99 {
-		// log.Info("Processing:", program[address:address+4], program[program[address+1]], program[program[address+2]])
 		if program[address] == 1 {
 			program[program[address+3]] = program[program[address+1]] + program[program[address+2]]
 		} else if program[address] == 2 {
 			program[program[address+3]] = program[program[address+1]] * program[program[address+2]]
 		}
-		// log.Info("New Value: ", program[address+3])
 		address += 4
 	}
-
-	log.Info("New address 0 (p1): ", program[0])
+	return program[0]
 }
