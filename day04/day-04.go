@@ -10,25 +10,37 @@ import (
 func main() {
 	h.WriteHeader(4)
 
-	// 785961
+	// 271973 - 785961
 	possibles := []int{}
 	for i:=271973; i<785961; i++ {
-		num := strings.Split(strconv.Itoa(i), "")
-		
-		holdLastDigit, err := strconv.Atoi(num[0])
-		if err != nil { h.OhShit(err) }
-
-		goodPass := false
-		for j:=1; j<len(num); j++ {
-			digit, err := strconv.Atoi(num[j])
+		chars := strings.Split(strconv.Itoa(i), "")
+		num := [6]int{}
+		var hold int
+		for j:=0; j<len(chars); j++ {
+			hold, err := strconv.Atoi(chars[j]);
+			num[j] = hold
 			if err != nil { h.OhShit(err) }
-			if digit < holdLastDigit { goodPass = false; break }
-			if digit == holdLastDigit { goodPass = true }
-			holdLastDigit = digit
 		}
-		if goodPass { possibles = append(possibles, i) }
+		if hold < 0 { log.Error("This is dumb") }
+		// log.Info("Checking ", num)
+
+		increments := true
+		hasPair := false
+		for j:=1; j<len(num); j++ {
+			if num[j] < num[j-1] { increments = false; break }
+		}
+		if increments {
+			for j:=1; j<len(num); j++ {
+				if j > 1 && num[j] == num[j-1] && num[j] == num[j-2] { continue }
+				if j < 4 && num[j] == num[j+1] && num[j] == num[j+2] { continue }
+				if j == 1 && num[j] == num[j-1] && num[j] != num[j+1] { hasPair = true }
+				if j > 1 && j < 5 && num[j] == num[j-1] && num[j] != num[j+1] { hasPair = true }
+				if j == 5 && num[j] == num[j-1] { hasPair = true }
+			}
+		}
+		if increments && hasPair { possibles = append(possibles, i) }
 	}
 
 	// log.Info(possibles)
-	log.Info("Possible passwords (p1): ", len(possibles));
+	log.Info("Possible passwords (p2): ", len(possibles));
 }
