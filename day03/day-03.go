@@ -49,9 +49,9 @@ func main() {
 	}
 	intersections = intersections[1:] // don't want 0,0
 	
-	// calculate manhatten distance
-	// |x1 - x2| + |y1 - y2|
-	holdLeastDist := float64(999999999)
+	// calculate distance
+	holdLeastManhattanDist := float64(999999999)
+	holdLeastSteps := 999999999
 	for _, intersection := range intersections {
 		coords := comRe.Split(intersection, -1)
 		x, err := strconv.Atoi(coords[0])
@@ -59,12 +59,31 @@ func main() {
 		y, err := strconv.Atoi(coords[1])
 		if err != nil { h.OhShit(err) }
 		dist := math.Abs(float64(x)) + math.Abs(float64(y))
-		if dist < holdLeastDist {
-			holdLeastDist = dist
+		if dist < holdLeastManhattanDist {
+			holdLeastManhattanDist = dist
+		}
+
+		wireOneSteps := 0
+		wireTwoSteps := 0
+		for _, pos := range wireOne {
+			if pos == intersection {
+				break
+			}
+			wireOneSteps++
+		}
+		for _, pos := range wireTwo {
+			if pos == intersection {
+				break
+			}
+			wireTwoSteps++
+		}
+		if (wireOneSteps + wireTwoSteps) < holdLeastSteps {
+			holdLeastSteps = wireOneSteps + wireTwoSteps
 		}
 	}
 
-	log.Info("Least distant intersection (p1): ", holdLeastDist);
+	log.Info("Least manhattan distant (p1): ", holdLeastManhattanDist);
+	log.Info("Least steps intersection (p2): ", holdLeastSteps);
 }
 
 func plotWire(directions []string) (coords []string) {
