@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	h.WriteHeader(2)
+	h.WriteHeader(5)
 	
 	if len(os.Args) < 3 { h.OhShit(errors.New("Please provide the filename and input value")) }
 
