@@ -34,12 +34,39 @@ func main() {
 		// log.Info("Count for ", moon, " is ", count)
 		totalOrbits += count
 	}
-
 	log.Info("Direct and Indirect Orbits (p1): ", totalOrbits)
+
+
+	myPath := tracePath(orbits["YOU"], orbits)
+	santaPath := tracePath(orbits["SAN"], orbits)
+	for i, planet := range myPath {
+		match := indexOf(santaPath, planet)
+		if match > -1 {
+			log.Info("Transfers to SAN (p2): ", (i + match))
+			break
+		}
+	}
 }
 
 func tallyParents(planet string, orbits map[string]string, lastTally int) int {
 	if planet == "COM" { return lastTally }
 	lastTally++
 	return tallyParents(orbits[planet], orbits, lastTally)
+}
+
+func tracePath(start string, orbits map[string]string) []string {
+	current := start
+	trace := []string{}
+	for {
+		trace = append(trace, current)
+		current = orbits[current]
+		if current == "COM" { break }
+	}
+
+	return trace
+}
+
+func indexOf(set []string, elem string) int {
+    for i, val := range set { if elem == val { return i } }
+    return -1
 }
