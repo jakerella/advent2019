@@ -20,7 +20,11 @@ func main() {
 	image := []int{}
 	h.OhShit(json.NewDecoder(input).Decode(&image))
 
-	layerSize := 25 * 6
+	// image = []int{0,2,2,2,1,1,2,2,2,2,1,2,0,0,0,0}
+	
+	rows := 6
+	cols := 25
+	layerSize := rows * cols
 	layers := [][]int{}
 
 	layerStart := 0
@@ -50,4 +54,33 @@ func main() {
 	}
 	
 	log.Info("Least zeros layer checksum (p1): ",(ones * twos))
+
+	visiblePixels := []int{}
+	for i:=0; i<layerSize; i++ {
+		visiblePixels = append(visiblePixels, 2)
+		for _, layer := range layers {
+			if layer[i] < 2 {
+				visiblePixels[i] = layer[i]
+				break
+			}
+		}
+	}
+
+	log.Info("Visible Pixels: ", visiblePixels)
+	renderImage(visiblePixels)
+}
+
+
+func renderImage(pixels []int) {
+	line := ""
+	for _, pixel := range pixels {
+		char := " "
+		if pixel == 0 { char = " " }
+		if pixel == 1 { char = "X" }
+		line += char
+		if len(line) >= 25 {
+			log.Info(line)
+			line = ""
+		}
+	}
 }
