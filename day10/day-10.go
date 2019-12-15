@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"strings"
 	"math"
+	"sort"
 )
 
 func main() {
@@ -39,44 +40,79 @@ func main() {
 
 	holdMaxVisible := 0
 	var holdPos [2]int
+	var visibleAngles map[float64][2]int
 	for y,sectorLine := range asteroidMap {
 		for x,sector := range sectorLine {
 			if sector == 1 {
-				visible := findVisibles([2]int{x,y}, asteroidMap)
-				if visible > holdMaxVisible {
-					holdMaxVisible = visible
+				visibleAngles = findVisibles([2]int{x,y}, asteroidMap)
+				if len(visibleAngles) > holdMaxVisible {
+					holdMaxVisible = len(visibleAngles)
 					holdPos = [2]int{x,y}
 				}
-				// log.Info("Asteroid ", x, y, " can see ", visible)
 			}
 		}
 	}
 
 	log.Info("Max visible (p1): ", holdMaxVisible, " at ", holdPos)
+	
+	visibleAngles = findVisibles(holdPos, asteroidMap)
+
+	numVaporized := 0
+	var twoHundredth [2]int
+	for asteroidCount > 1 {
+		keys := make([]float64, 0, len(visibleAngles))
+		for k,_ := range visibleAngles {
+			keys = append(keys, k)
+		}
+		sort.Float64s(keys)
+		// I'm off by 90 degrees... no idea why, this finds "up" (0 deg) and shifts the keys
+		var up int
+		for i,angle := range keys {
+			if visibleAngles[angle][0] == holdPos[0] && visibleAngles[angle][1] < holdPos[1] {
+				up = i
+				break
+			}
+		}
+		temp := keys[up:]
+		keys = append(temp, keys[0:up]...)
+		// log.Info(keys)
+
+		for _,angle := range keys {
+			numVaporized++
+			asteroidCount--
+			log.Info("Vaporizing asteroid ", numVaporized, " at ", visibleAngles[angle], " with angle ", angle)
+			asteroidMap[visibleAngles[angle][1]][visibleAngles[angle][0]] = 0
+			if numVaporized == 200 {
+				twoHundredth = visibleAngles[angle]
+			}
+		}
+
+		log.Info("Finding visible asteroids again")
+		visibleAngles = findVisibles(holdPos, asteroidMap)
+	}
+	log.Info("Two Hundredth kill (p2): ", twoHundredth)
 }
 
-func findVisibles(pos [2]int, asteroidMap [][]int) int {
-	visible := 0
-	angles := make(map[float64]bool)
+
+func findVisibles(pos [2]int, asteroidMap [][]int) map[float64][2]int {
+	// log.Info("Finding visible asteroids from point ", pos)
+	angles := make(map[float64][2]int)
 	for y,sectorLine := range asteroidMap {
 		for x,sector := range sectorLine {
 			if sector == 1 {
 				if pos[0] == x && pos[1] == y { continue }
 				angle := getAngle(pos, [2]int{x,y})
 				if _,ok := angles[angle]; !ok {
-					angles[angle] = true
-					visible++
+					angles[angle] = [2]int{x,y}
 				}	
 			}
 		}
 	}
-	return visible
+	return angles
 }
 
 func getAngle(source [2]int, target [2]int) float64 {
-	angle := math.Atan2(float64(target[0] - source[0]), float64(source[1] - target[1])) * 180 / math.Pi
-	if angle < 0 {
-		angle = angle + 360
-	}
+	angle := math.Atan2(float64(target[1] - source[1]), float64(target[0] - source[0])) * 180 / math.Pi
+	if angle < 0 { angle += 360 }
 	return angle
 }
