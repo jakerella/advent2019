@@ -17,7 +17,7 @@ type Moon struct {
 }
 
 func main() {
-	h.WriteHeader(10)
+	h.WriteHeader(12)
 	
 	if len(os.Args) < 2 { h.OhShit(errors.New("Please provide the input filename")) }
 
